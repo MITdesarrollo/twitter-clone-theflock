@@ -1,3 +1,4 @@
 export { Email } from './Email';
 export { Username } from './Username';
 export { Password } from './Password';
+export { TweetContent } from './TweetContent';
