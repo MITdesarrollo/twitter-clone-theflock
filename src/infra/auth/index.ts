@@ -1,1 +1,1 @@
-export type {};
+export { JoseAuthService } from './JoseAuthService';

@@ -1,1 +1,1 @@
-export type {};
+export { PrismaUserRepository } from './PrismaUserRepository';
