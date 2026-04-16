@@ -8,8 +8,12 @@ export type {
   PaginatedTweets,
 } from './ITweetRepository';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface ILikeRepository {}
+export type {
+  IFollowRepository,
+  FollowPaginationOptions,
+  PaginatedUsers,
+  FollowCounts,
+} from './IFollowRepository';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface IFollowRepository {}
+export interface ILikeRepository {}
