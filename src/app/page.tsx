@@ -1,7 +1,7 @@
 export default function HomePage() {
   return (
-    <main className="flex min-h-screen items-center justify-center">
-      <h1 className="text-2xl font-bold text-foreground">Twitter Clone</h1>
-    </main>
+    <div className="flex min-h-screen items-center justify-center">
+      <p className="text-muted-foreground">Timeline coming soon.</p>
+    </div>
   );
 }
