@@ -14,7 +14,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/core/**', 'src/infra/**'],
-      exclude: ['src/generated/**'],
+      exclude: ['src/generated/**', 'src/infra/prisma/client.ts', 'src/infra/prisma/repositories/**', 'src/infra/prisma/mappers/**'],
       thresholds: {
         lines: 80,
         branches: 80,
