@@ -21,7 +21,7 @@ export class PrismaTweetRepository implements ITweetRepository {
   async create(data: CreateTweetData): Promise<Tweet> {
     const row = await this.prisma.tweet.create({
       data: { content: data.content, authorId: data.authorId, parentId: data.parentId ?? null },
-      include: { author: AUTHOR_SELECT },
+      include: { author: AUTHOR_SELECT, _count: { select: { likes: true } } },
     });
     return TweetMapper.toDomain(row);
   }
@@ -29,7 +29,7 @@ export class PrismaTweetRepository implements ITweetRepository {
   async findById(id: string): Promise<Tweet | null> {
     const row = await this.prisma.tweet.findUnique({
       where: { id },
-      include: { author: AUTHOR_SELECT },
+      include: { author: AUTHOR_SELECT, _count: { select: { likes: true } } },
     });
     return row ? TweetMapper.toDomain(row) : null;
   }
@@ -63,7 +63,7 @@ export class PrismaTweetRepository implements ITweetRepository {
       },
       orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
       take: limit + 1,
-      include: { author: AUTHOR_SELECT },
+      include: { author: AUTHOR_SELECT, _count: { select: { likes: true } } },
     });
 
     const hasMore = rows.length > limit;
@@ -95,7 +95,7 @@ export class PrismaTweetRepository implements ITweetRepository {
       },
       orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
       take: limit + 1,
-      include: { author: AUTHOR_SELECT },
+      include: { author: AUTHOR_SELECT, _count: { select: { likes: true } } },
     });
 
     const hasMore = rows.length > limit;
