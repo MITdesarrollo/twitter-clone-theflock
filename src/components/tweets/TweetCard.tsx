@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { Heart } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import type { PublicTweet } from '@/core/domain/entities/Tweet';
 
 function timeAgo(date: Date): string {
@@ -19,10 +21,12 @@ function timeAgo(date: Date): string {
 interface TweetCardProps {
   tweet: PublicTweet;
   currentUserId?: string;
+  isLiked?: boolean;
   onDelete?: (id: string) => void;
+  onLike?: (id: string) => void;
 }
 
-export function TweetCard({ tweet, currentUserId, onDelete }: TweetCardProps) {
+export function TweetCard({ tweet, currentUserId, isLiked, onDelete, onLike }: TweetCardProps) {
   const isOwner = currentUserId && tweet.authorId === currentUserId;
   const initials = tweet.author?.displayName?.[0]?.toUpperCase() ?? '?';
 
@@ -48,18 +52,25 @@ export function TweetCard({ tweet, currentUserId, onDelete }: TweetCardProps) {
             <span className="text-muted-foreground text-sm">· {timeAgo(tweet.createdAt)}</span>
           </div>
           <p className="mt-1 whitespace-pre-wrap break-words">{tweet.content}</p>
-          {isOwner && onDelete && (
-            <div className="mt-2">
+          <div className="mt-2 flex items-center gap-4">
+            <button
+              onClick={() => onLike?.(tweet.id)}
+              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-red-500 transition-colors"
+            >
+              <Heart className={cn('h-4 w-4', isLiked && 'fill-red-500 text-red-500')} />
+              <span>{tweet.likeCount ?? 0}</span>
+            </button>
+            {isOwner && onDelete && (
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-destructive hover:text-destructive"
+                className="text-destructive hover:text-destructive h-auto p-0 text-sm"
                 onClick={() => onDelete(tweet.id)}
               >
                 Delete
               </Button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </article>

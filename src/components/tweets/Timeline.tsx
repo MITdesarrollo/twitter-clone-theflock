@@ -6,9 +6,18 @@ import { TweetComposer } from './TweetComposer';
 import { TweetCard } from './TweetCard';
 import type { PublicTweet } from '@/core/domain/entities/Tweet';
 
+async function fetchLikedIds(tweetIds: string[]): Promise<Set<string>> {
+  if (tweetIds.length === 0) return new Set();
+  const res = await fetch(`/api/tweets/liked-ids?ids=${tweetIds.join(',')}`);
+  if (!res.ok) return new Set();
+  const data = await res.json();
+  return new Set(data.likedIds as string[]);
+}
+
 export function Timeline() {
   const { user } = useAuth();
   const [tweets, setTweets] = useState<PublicTweet[]>([]);
+  const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -25,9 +34,12 @@ export function Timeline() {
 
   useEffect(() => {
     fetchTweets()
-      .then((data) => {
+      .then(async (data) => {
         setTweets(data.tweets);
         setNextCursor(data.nextCursor);
+        const ids = data.tweets.map((t: PublicTweet) => t.id);
+        const liked = await fetchLikedIds(ids);
+        setLikedIds(liked);
       })
       .catch(console.error)
       .finally(() => setIsLoading(false));
@@ -40,6 +52,9 @@ export function Timeline() {
       const data = await fetchTweets(nextCursor);
       setTweets((prev) => [...prev, ...data.tweets]);
       setNextCursor(data.nextCursor);
+      const ids = data.tweets.map((t: PublicTweet) => t.id);
+      const liked = await fetchLikedIds(ids);
+      setLikedIds((prev) => new Set([...prev, ...liked]));
     } catch (err) {
       console.error(err);
     } finally {
@@ -71,6 +86,19 @@ export function Timeline() {
     }
   }
 
+  async function handleLike(id: string) {
+    const res = await fetch(`/api/tweets/${id}/like`, { method: 'POST' });
+    if (!res.ok) return;
+    const data = await res.json();
+    setLikedIds((prev) => {
+      const next = new Set(prev);
+      if (data.liked) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+    setTweets((prev) => prev.map((t) => (t.id === id ? { ...t, likeCount: data.likeCount } : t)));
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -96,7 +124,9 @@ export function Timeline() {
               key={tweet.id}
               tweet={tweet}
               currentUserId={user?.id}
+              isLiked={likedIds.has(tweet.id)}
               onDelete={handleDelete}
+              onLike={handleLike}
             />
           ))}
           <div ref={sentinelRef} className="h-4" />
