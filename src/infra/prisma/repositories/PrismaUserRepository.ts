@@ -32,4 +32,18 @@ export class PrismaUserRepository implements IUserRepository {
     });
     return UserMapper.toDomain(user);
   }
+
+  async search(query: string, limit = 20): Promise<User[]> {
+    const users = await this.prisma.user.findMany({
+      where: {
+        OR: [
+          { username: { contains: query, mode: 'insensitive' } },
+          { displayName: { contains: query, mode: 'insensitive' } },
+        ],
+      },
+      take: Math.min(limit, 50),
+      orderBy: { username: 'asc' },
+    });
+    return users.map(UserMapper.toDomain);
+  }
 }

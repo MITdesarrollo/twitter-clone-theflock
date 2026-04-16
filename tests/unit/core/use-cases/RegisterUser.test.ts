@@ -22,6 +22,7 @@ function createMocks() {
     findByEmail: vi.fn().mockResolvedValue(null),
     findByUsername: vi.fn().mockResolvedValue(null),
     create: vi.fn().mockResolvedValue(mockUser),
+    search: vi.fn().mockResolvedValue([]),
   };
   const authService: IAuthService = {
     signToken: vi.fn().mockResolvedValue('jwt-token'),
