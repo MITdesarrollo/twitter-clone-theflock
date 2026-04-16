@@ -6,7 +6,11 @@ export default defineConfig({
   plugins: [react(), tsconfigPaths()],
   test: {
     environment: 'happy-dom',
-    include: ['tests/unit/**/*.test.ts', 'tests/unit/**/*.test.tsx', 'tests/integration/**/*.test.ts'],
+    include: [
+      'tests/unit/**/*.test.ts',
+      'tests/unit/**/*.test.tsx',
+      'tests/integration/**/*.test.ts',
+    ],
     coverage: {
       provider: 'v8',
       include: ['src/core/**', 'src/infra/**'],
