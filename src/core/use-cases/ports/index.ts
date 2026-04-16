@@ -15,5 +15,4 @@ export type {
   FollowCounts,
 } from './IFollowRepository';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface ILikeRepository {}
+export type { ILikeRepository, ToggleLikeResult } from './ILikeRepository';
