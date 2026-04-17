@@ -3,7 +3,7 @@ import type { Tweet as PrismaTweet, User as PrismaUser } from '@/generated/prism
 
 type PrismaTweetWithAuthor = PrismaTweet & {
   author?: Pick<PrismaUser, 'id' | 'username' | 'displayName' | 'avatarUrl'> | null;
-  _count?: { likes: number } | null;
+  _count?: { likes: number; replies: number } | null;
 };
 
 export class TweetMapper {
@@ -17,6 +17,7 @@ export class TweetMapper {
       updatedAt: row.updatedAt,
       author: row.author ?? undefined,
       likeCount: row._count?.likes ?? 0,
+      replyCount: row._count?.replies ?? 0,
     });
   }
 }

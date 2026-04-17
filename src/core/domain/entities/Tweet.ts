@@ -14,6 +14,7 @@ export interface TweetProps {
   updatedAt: Date;
   author?: TweetAuthor;
   likeCount?: number;
+  replyCount?: number;
 }
 
 export interface PublicTweet {
@@ -25,6 +26,7 @@ export interface PublicTweet {
   updatedAt: Date;
   author: TweetAuthor | null;
   likeCount: number;
+  replyCount: number;
 }
 
 export class Tweet {
@@ -58,6 +60,9 @@ export class Tweet {
   get likeCount() {
     return this.props.likeCount ?? 0;
   }
+  get replyCount() {
+    return this.props.replyCount ?? 0;
+  }
 
   toPublic(): PublicTweet {
     return {
@@ -69,6 +74,7 @@ export class Tweet {
       updatedAt: this.updatedAt,
       author: this.author ?? null,
       likeCount: this.likeCount,
+      replyCount: this.replyCount,
     };
   }
 }

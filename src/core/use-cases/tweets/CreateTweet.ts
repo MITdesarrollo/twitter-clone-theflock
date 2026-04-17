@@ -5,6 +5,7 @@ import type { PublicTweet } from '@/core/domain/entities/Tweet';
 export interface CreateTweetInput {
   authorId: string;
   content: string;
+  parentId?: string | null;
 }
 
 export class CreateTweet {
@@ -15,7 +16,7 @@ export class CreateTweet {
     const tweet = await this.tweetRepo.create({
       content: content.value,
       authorId: input.authorId,
-      parentId: null,
+      parentId: input.parentId ?? null,
     });
     return tweet.toPublic();
   }

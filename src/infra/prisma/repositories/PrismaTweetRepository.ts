@@ -21,7 +21,7 @@ export class PrismaTweetRepository implements ITweetRepository {
   async create(data: CreateTweetData): Promise<Tweet> {
     const row = await this.prisma.tweet.create({
       data: { content: data.content, authorId: data.authorId, parentId: data.parentId ?? null },
-      include: { author: AUTHOR_SELECT, _count: { select: { likes: true } } },
+      include: { author: AUTHOR_SELECT, _count: { select: { likes: true, replies: true } } },
     });
     return TweetMapper.toDomain(row);
   }
@@ -29,7 +29,7 @@ export class PrismaTweetRepository implements ITweetRepository {
   async findById(id: string): Promise<Tweet | null> {
     const row = await this.prisma.tweet.findUnique({
       where: { id },
-      include: { author: AUTHOR_SELECT, _count: { select: { likes: true } } },
+      include: { author: AUTHOR_SELECT, _count: { select: { likes: true, replies: true } } },
     });
     return row ? TweetMapper.toDomain(row) : null;
   }
@@ -63,7 +63,7 @@ export class PrismaTweetRepository implements ITweetRepository {
       },
       orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
       take: limit + 1,
-      include: { author: AUTHOR_SELECT, _count: { select: { likes: true } } },
+      include: { author: AUTHOR_SELECT, _count: { select: { likes: true, replies: true } } },
     });
 
     const hasMore = rows.length > limit;
@@ -95,7 +95,38 @@ export class PrismaTweetRepository implements ITweetRepository {
       },
       orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
       take: limit + 1,
-      include: { author: AUTHOR_SELECT, _count: { select: { likes: true } } },
+      include: { author: AUTHOR_SELECT, _count: { select: { likes: true, replies: true } } },
+    });
+
+    const hasMore = rows.length > limit;
+    const items = hasMore ? rows.slice(0, limit) : rows;
+    const nextCursor =
+      hasMore && items.length > 0
+        ? encodeCursor(items[items.length - 1].createdAt, items[items.length - 1].id)
+        : null;
+
+    return { tweets: items.map(TweetMapper.toDomain), nextCursor };
+  }
+
+  async getReplies(tweetId: string, options?: PaginationOptions): Promise<PaginatedTweets> {
+    const limit = Math.min(options?.limit ?? DEFAULT_LIMIT, MAX_LIMIT);
+    const cursor = options?.cursor ? decodeCursor(options.cursor) : null;
+
+    const rows = await this.prisma.tweet.findMany({
+      where: {
+        parentId: tweetId,
+        ...(cursor
+          ? {
+              OR: [
+                { createdAt: { gt: cursor.createdAt } },
+                { createdAt: cursor.createdAt, id: { gt: cursor.id } },
+              ],
+            }
+          : {}),
+      },
+      orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+      take: limit + 1,
+      include: { author: AUTHOR_SELECT, _count: { select: { likes: true, replies: true } } },
     });
 
     const hasMore = rows.length > limit;

@@ -6,3 +6,5 @@ export { GetTimeline } from './GetTimeline';
 export type { GetTimelineInput, GetTimelineResult } from './GetTimeline';
 export { GetUserTweets } from './GetUserTweets';
 export type { GetUserTweetsInput } from './GetUserTweets';
+export { GetTweetWithReplies } from './GetTweetWithReplies';
+export type { GetTweetWithRepliesInput, GetTweetWithRepliesResult } from './GetTweetWithReplies';

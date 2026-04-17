@@ -19,6 +19,7 @@ function createMockRepo(): ITweetRepository {
     delete: vi.fn().mockResolvedValue(undefined),
     getTimeline: vi.fn(),
     getByAuthor: vi.fn(),
+    getReplies: vi.fn(),
   };
 }
 

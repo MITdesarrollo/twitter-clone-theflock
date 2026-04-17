@@ -22,4 +22,5 @@ export interface ITweetRepository {
   delete(id: string): Promise<void>;
   getTimeline(userId: string, options?: PaginationOptions): Promise<PaginatedTweets>;
   getByAuthor(authorId: string, options?: PaginationOptions): Promise<PaginatedTweets>;
+  getReplies(tweetId: string, options?: PaginationOptions): Promise<PaginatedTweets>;
 }
