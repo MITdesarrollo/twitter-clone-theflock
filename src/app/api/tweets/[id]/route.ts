@@ -4,6 +4,26 @@ import { JoseAuthService } from '@/infra/auth/JoseAuthService';
 import { PrismaTweetRepository } from '@/infra/prisma/repositories/PrismaTweetRepository';
 import { prisma } from '@/infra/prisma/client';
 import { DeleteTweet } from '@/core/use-cases/tweets/DeleteTweet';
+import { GetTweetWithReplies } from '@/core/use-cases/tweets/GetTweetWithReplies';
+
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    const { searchParams } = new URL(request.url);
+    const cursor = searchParams.get('cursor') ?? undefined;
+    const limit = searchParams.get('limit') ? Number(searchParams.get('limit')) : undefined;
+
+    const tweetRepo = new PrismaTweetRepository(prisma);
+    const useCase = new GetTweetWithReplies(tweetRepo);
+    const result = await useCase.execute({ tweetId: id, cursor, limit });
+
+    if (!result) return NextResponse.json({ error: 'Tweet not found' }, { status: 404 });
+    return NextResponse.json(result);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
 
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {

@@ -30,7 +30,11 @@ export async function POST(request: Request) {
 
     const tweetRepo = new PrismaTweetRepository(prisma);
     const useCase = new CreateTweet(tweetRepo);
-    const tweet = await useCase.execute({ authorId: payload.sub, content: parsed.data.content });
+    const tweet = await useCase.execute({
+      authorId: payload.sub,
+      content: parsed.data.content,
+      parentId: parsed.data.parentId,
+    });
     return NextResponse.json({ tweet }, { status: 201 });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
