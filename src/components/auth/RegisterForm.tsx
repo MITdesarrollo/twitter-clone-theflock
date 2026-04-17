@@ -55,12 +55,12 @@ export function RegisterForm() {
         />
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
-      <Button type="submit" className="w-full" disabled={isLoading}>
+      <Button type="submit" className="w-full rounded-full font-bold" disabled={isLoading}>
         {isLoading ? 'Creating account...' : 'Create account'}
       </Button>
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{' '}
-        <Link href="/login" className="text-primary underline">
+        <Link href="/login" className="font-semibold text-primary hover:underline">
           Sign in
         </Link>
       </p>

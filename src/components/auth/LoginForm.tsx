@@ -41,12 +41,12 @@ export function LoginForm() {
         />
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
-      <Button type="submit" className="w-full" disabled={isLoading}>
+      <Button type="submit" className="w-full rounded-full font-bold" disabled={isLoading}>
         {isLoading ? 'Signing in...' : 'Sign in'}
       </Button>
       <p className="text-center text-sm text-muted-foreground">
         Don&apos;t have an account?{' '}
-        <Link href="/register" className="text-primary underline">
+        <Link href="/register" className="font-semibold text-primary hover:underline">
           Register
         </Link>
       </p>

@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { Heart, MessageCircle } from 'lucide-react';
+import { Heart, MessageCircle, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { PublicTweet } from '@/core/domain/entities/Tweet';
 
@@ -29,57 +29,83 @@ interface TweetCardProps {
 export function TweetCard({ tweet, currentUserId, isLiked, onDelete, onLike }: TweetCardProps) {
   const isOwner = currentUserId && tweet.authorId === currentUserId;
   const initials = tweet.author?.displayName?.[0]?.toUpperCase() ?? '?';
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  function handleLikeClick() {
+    if (!isLiked) {
+      setIsAnimating(true);
+      setTimeout(() => setIsAnimating(false), 350);
+    }
+    onLike?.(tweet.id);
+  }
 
   return (
-    <article className="border-b border-border p-4">
+    <article className="border-b border-border p-4 transition-colors hover:bg-accent/30">
       <div className="flex gap-3">
-        <Link href={`/profile/${tweet.author?.username ?? ''}`}>
-          <Avatar className="h-10 w-10">
-            <AvatarFallback>{initials}</AvatarFallback>
+        <Link href={`/profile/${tweet.author?.username ?? ''}`} className="flex-shrink-0">
+          <Avatar className="h-11 w-11 ring-2 ring-transparent transition-all hover:ring-primary/20">
+            <AvatarFallback className="bg-primary/10 font-semibold text-primary">
+              {initials}
+            </AvatarFallback>
           </Avatar>
         </Link>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5 text-[15px]">
             <Link
               href={`/profile/${tweet.author?.username ?? ''}`}
-              className="font-semibold truncate hover:underline"
+              className="truncate font-bold hover:underline"
             >
               {tweet.author?.displayName ?? 'Unknown'}
             </Link>
-            <span className="text-muted-foreground text-sm truncate">
+            <span className="truncate text-sm text-muted-foreground">
               @{tweet.author?.username ?? 'unknown'}
             </span>
-            <span className="text-muted-foreground text-sm">· {timeAgo(tweet.createdAt)}</span>
+            <span className="text-sm text-muted-foreground">· {timeAgo(tweet.createdAt)}</span>
           </div>
           <Link href={`/tweet/${tweet.id}`} className="block">
-            <p className="mt-1 whitespace-pre-wrap break-words hover:text-foreground/80">
+            <p className="mt-1 whitespace-pre-wrap break-words text-[15px] leading-snug">
               {tweet.content}
             </p>
           </Link>
-          <div className="mt-2 flex items-center gap-4">
+          <div className="mt-3 flex items-center gap-6 text-muted-foreground">
             <Link
               href={`/tweet/${tweet.id}`}
-              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors"
+              className="group flex items-center gap-1.5 text-sm transition-colors hover:text-primary"
             >
-              <MessageCircle className="h-4 w-4" />
-              <span>{tweet.replyCount ?? 0}</span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-full transition-colors group-hover:bg-primary/10">
+                <MessageCircle className="h-4 w-4" />
+              </span>
+              <span className="tabular-nums">{tweet.replyCount ?? 0}</span>
             </Link>
             <button
-              onClick={() => onLike?.(tweet.id)}
-              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-red-500 transition-colors"
+              onClick={handleLikeClick}
+              className={cn(
+                'group flex items-center gap-1.5 text-sm transition-colors',
+                isLiked ? 'text-red-500' : 'hover:text-red-500',
+              )}
+              aria-label={isLiked ? 'Unlike' : 'Like'}
             >
-              <Heart className={cn('h-4 w-4', isLiked && 'fill-red-500 text-red-500')} />
-              <span>{tweet.likeCount ?? 0}</span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-full transition-colors group-hover:bg-red-500/10">
+                <Heart
+                  className={cn(
+                    'h-4 w-4 transition-all',
+                    isLiked && 'fill-red-500 text-red-500',
+                    isAnimating && 'animate-heart-pop',
+                  )}
+                />
+              </span>
+              <span className="tabular-nums">{tweet.likeCount ?? 0}</span>
             </button>
             {isOwner && onDelete && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-destructive hover:text-destructive h-auto p-0 text-sm"
+              <button
                 onClick={() => onDelete(tweet.id)}
+                className="group ml-auto flex items-center gap-1.5 text-sm transition-colors hover:text-destructive"
+                aria-label="Delete tweet"
               >
-                Delete
-              </Button>
+                <span className="flex h-8 w-8 items-center justify-center rounded-full transition-colors group-hover:bg-destructive/10">
+                  <Trash2 className="h-4 w-4" />
+                </span>
+              </button>
             )}
           </div>
         </div>

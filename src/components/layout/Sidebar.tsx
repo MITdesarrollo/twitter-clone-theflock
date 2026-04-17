@@ -1,65 +1,69 @@
 'use client';
 
 import Link from 'next/link';
+import { Home, Search, User, LogOut } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { ThemeToggle } from './ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
-const navItems = [
-  { href: '/', label: 'Home' },
-  { href: '/search', label: 'Explore' },
-];
-
 export function Sidebar() {
   const { user, logout } = useAuth();
 
+  const navItems = [
+    { href: '/', label: 'Home', Icon: Home },
+    { href: '/search', label: 'Explore', Icon: Search },
+    ...(user ? [{ href: `/profile/${user.username}`, label: 'Profile', Icon: User }] : []),
+  ];
+
   return (
-    <aside className="hidden md:flex flex-col justify-between w-64 border-r border-border p-4 h-screen sticky top-0">
+    <aside className="sticky top-0 hidden h-screen w-64 flex-col justify-between border-r border-border p-4 md:flex">
       <div>
-        <h1 className="text-xl font-bold mb-8 px-2">Twitter Clone</h1>
+        <Link href="/" className="mb-6 flex items-center gap-2 px-2">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary">
+            <span className="text-lg font-bold text-primary-foreground">F</span>
+          </div>
+          <span className="text-xl font-bold">Flock</span>
+        </Link>
         <nav className="space-y-1">
-          {navItems.map((item) => (
+          {navItems.map(({ href, label, Icon }) => (
             <Link
-              key={item.href}
-              href={item.href}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+              key={href}
+              href={href}
+              className="flex items-center gap-4 rounded-full px-4 py-3 text-lg transition-colors hover:bg-accent"
             >
-              <span className="text-lg">{item.label}</span>
+              <Icon className="h-6 w-6" strokeWidth={1.75} />
+              <span className="font-medium">{label}</span>
             </Link>
           ))}
-          {user && (
-            <Link
-              href={`/profile/${user.username}`}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-            >
-              <span className="text-lg">Profile</span>
-            </Link>
-          )}
         </nav>
       </div>
-      <div className="space-y-3 px-2">
+      <div className="space-y-3">
         {user ? (
-          <div className="flex items-center gap-2">
-            <Avatar className="h-8 w-8">
-              <AvatarFallback>{user.displayName[0]?.toUpperCase()}</AvatarFallback>
+          <div className="flex items-center gap-3 rounded-full p-2 transition-colors hover:bg-accent">
+            <Avatar className="h-9 w-9">
+              <AvatarFallback className="bg-primary/10 font-semibold text-primary">
+                {user.displayName[0]?.toUpperCase()}
+              </AvatarFallback>
             </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{user.displayName}</p>
-              <p className="text-xs text-muted-foreground truncate">@{user.username}</p>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-bold">{user.displayName}</p>
+              <p className="truncate text-xs text-muted-foreground">@{user.username}</p>
             </div>
-            <Button variant="ghost" size="sm" onClick={logout}>
-              Logout
+            <Button variant="ghost" size="icon" onClick={logout} aria-label="Logout">
+              <LogOut className="h-4 w-4" />
             </Button>
           </div>
         ) : (
-          <Link href="/login">
-            <Button variant="outline" className="w-full">
+          <Link href="/login" className="block">
+            <Button variant="outline" className="w-full rounded-full font-bold">
               Sign in
             </Button>
           </Link>
         )}
-        <ThemeToggle />
+        <div className="px-2">
+          <ThemeToggle />
+        </div>
       </div>
     </aside>
   );

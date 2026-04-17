@@ -11,6 +11,7 @@ interface FollowButtonProps {
 
 export function FollowButton({ username, initialIsFollowing, isOwnProfile }: FollowButtonProps) {
   const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
+  const [isHovered, setIsHovered] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   if (isOwnProfile) return null;
@@ -31,11 +32,13 @@ export function FollowButton({ username, initialIsFollowing, isOwnProfile }: Fol
   return (
     <Button
       variant={isFollowing ? 'outline' : 'default'}
-      size="sm"
       onClick={handleToggle}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       disabled={isPending}
+      className="rounded-full px-5 font-bold min-w-[100px]"
     >
-      {isFollowing ? 'Following' : 'Follow'}
+      {isFollowing ? (isHovered ? 'Unfollow' : 'Following') : 'Follow'}
     </Button>
   );
 }
