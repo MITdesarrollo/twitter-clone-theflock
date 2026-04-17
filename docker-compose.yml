@@ -4,15 +4,15 @@ services:
     restart: unless-stopped
     profiles: ['dev', 'full']
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-flock}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-flock}
-      POSTGRES_DB: ${POSTGRES_DB:-flock_dev}
+      POSTGRES_USER: flock
+      POSTGRES_PASSWORD: flock
+      POSTGRES_DB: flock_dev
     ports:
       - '5433:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-flock}']
+      test: ['CMD-SHELL', 'pg_isready -U flock']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -23,8 +23,8 @@ services:
     ports:
       - '3000:3000'
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-flock}:${POSTGRES_PASSWORD:-flock}@postgres:5432/${POSTGRES_DB:-flock_dev}
-      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production}
+      DATABASE_URL: postgresql://flock:flock@postgres:5432/flock_dev
+      JWT_SECRET: docker-dev-secret-min-32-characters-long-enough
       NODE_ENV: production
     depends_on:
       postgres:
