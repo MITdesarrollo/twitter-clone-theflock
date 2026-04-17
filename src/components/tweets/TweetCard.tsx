@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Heart } from 'lucide-react';
+import { Heart, MessageCircle } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -51,8 +51,19 @@ export function TweetCard({ tweet, currentUserId, isLiked, onDelete, onLike }: T
             </span>
             <span className="text-muted-foreground text-sm">· {timeAgo(tweet.createdAt)}</span>
           </div>
-          <p className="mt-1 whitespace-pre-wrap break-words">{tweet.content}</p>
+          <Link href={`/tweet/${tweet.id}`} className="block">
+            <p className="mt-1 whitespace-pre-wrap break-words hover:text-foreground/80">
+              {tweet.content}
+            </p>
+          </Link>
           <div className="mt-2 flex items-center gap-4">
+            <Link
+              href={`/tweet/${tweet.id}`}
+              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
+              <MessageCircle className="h-4 w-4" />
+              <span>{tweet.replyCount ?? 0}</span>
+            </Link>
             <button
               onClick={() => onLike?.(tweet.id)}
               className="flex items-center gap-1 text-sm text-muted-foreground hover:text-red-500 transition-colors"
