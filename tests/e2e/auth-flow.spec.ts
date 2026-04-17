@@ -30,7 +30,10 @@ test.describe('Auth Flow', () => {
 
     await page.getByPlaceholder('Email').fill(testUser.email);
     await page.getByPlaceholder('Password').fill(testUser.password);
-    await page.getByRole('button', { name: /sign in/i }).click();
+    await page
+      .getByRole('main')
+      .getByRole('button', { name: /sign in/i })
+      .click();
 
     await page.waitForURL('/');
     await expect(page.getByText(testUser.displayName)).toBeVisible();
